@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
-import useAuth from "./useAuth";
-import { Container, Form } from "react-bootstrap";
+import React, {useState, useEffect} from 'react'
+import useAuth from "./useAuth"
+import { Container, Form } from "react-bootstrap"
 import SpotifyWebApi from 'spotify-web-api-node'
-import TrackSearchResult from "./TrackSearchResult";
+import TrackSearchResult from "./TrackSearchResult"
+import Player from './Player'
+import axios from "axios"
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "e785a4f85953442c96197254d8f1ef6a"
@@ -12,6 +14,26 @@ export default function Dashboard({code}) {
     const accessToken = useAuth(code)
     const [search, setSearch] = useState("")
     const [searchResults, setSearchResults] = useState([])
+    const [playingTrack, setPlayingTrack] = useState([])
+    const [lyrics, setLyrics] = useState([])
+
+    function chooseTrack(track) {
+        setPlayingTrack(track)
+        setSearch('')
+        setLyrics('')
+    }
+
+    useEffect(() => {
+        if (!playingTrack) return
+        axios.get('http://localhost:3001/lyrics', {
+            params: {
+                track: playingTrack.title,
+                artist: playingTrack.artist
+            }
+        }).then(res => {
+            setLyrics(res.data.lyrics)
+        })
+    }, [playingTrack])
 
     useEffect(() => {
         if (!accessToken) return
@@ -38,7 +60,6 @@ export default function Dashboard({code}) {
                 }
             }))
         })
-
         return () => cancel = true
     }, [search, accessToken])
 
@@ -53,12 +74,22 @@ export default function Dashboard({code}) {
                 onChange={e => setSearch(e.target.value)}/>
 
             <div className="flex-grow-1 my-2" style={{ overflowY: "auto"}}>
-                {searchResults.map(track => {
-                    <TrackSearchResult track={track} key={track.uri}/>
-                })}
+                {searchResults.map(track => (
+                    <TrackSearchResult
+                        track={track}
+                        key={track.uri}
+                        chooseTrack={chooseTrack}
+                    />
+                ))}
+                {searchResults.length === 0 && (
+                    <div className="text-center" style={{ whiteSpace: 'pre' }}>
+                        {lyrics}
+                    </div>
+                )}
             </div>
-
-            <div>Bottom</div>
+            <div>
+                <Player accessToken={accessToken}/>
+            </div>
         </Container>
     );
 }
