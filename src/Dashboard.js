@@ -5,6 +5,7 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import TrackSearchResult from "./TrackSearchResult"
 import Player from './Player'
 import axios from "axios"
+import SearchBar from './Components/SearchBar/Searchbar'
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "e785a4f85953442c96197254d8f1ef6a"
@@ -64,32 +65,35 @@ export default function Dashboard({code}) {
     }, [search, accessToken])
 
     return (
-        <Container
-            className="d-flex flex-column py-2"
+        <Container fluid
+            className="d-flex flex-column align-items-center"
             style={{height: "100vh"}}>
-            <Form.Control
-                type="search"
-                placeholder="Buscar músicas/artistas"
+            
+            <SearchBar
                 value={search}
-                onChange={e => setSearch(e.target.value)}/>
+                onChange={e => setSearch(e.target.value)}
+            />
 
-            <div className="flex-grow-1 my-2" style={{ overflowY: "auto"}}>
+            <div className="bg-white" style={{ overflowY: "auto", width: "650px"}}>
                 {searchResults.map(track => (
                     <TrackSearchResult
                         track={track}
                         key={track.uri}
-                        chooseTrack={chooseTrack}
-                    />
+                        chooseTrack={chooseTrack}/>
                 ))}
+
                 {searchResults.length === 0 && (
                     <div className="text-center" style={{ whiteSpace: 'pre' }}>
                         {lyrics}
                     </div>
                 )}
             </div>
-            <div>
+
+            <div style={{ width: "650px", display: "flex"}}>
                 <Player accessToken={accessToken}/>
             </div>
+            
+
         </Container>
     );
 }

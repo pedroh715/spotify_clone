@@ -1,0 +1,28 @@
+
+#searchInput{
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+#searchInput input {
+    border-top-left-radius: 7px;
+    background-color: white;
+    border: 0;
+    outline: none;
+    font-size: 18px;
+    padding: 15px;
+    height: 50px;
+    width: 600px;
+}
+
+#searchIcon{
+    border-top-right-radius: 7px;
+    background-color: #59EFD2;
+    color: white;
+    border: 0;
+    min-height: 50px;
+    min-width: 50px;
+    display: grid;
+    place-items: center;
+}
